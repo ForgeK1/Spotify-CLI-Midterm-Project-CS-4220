@@ -115,7 +115,7 @@ export const getArtistByName = async (accessToken, artistName) => {
 }
 
 //A method to get an audiobook as a JSON object by their name
-export const getAudiobookByName = async (accessToken, audiobookName) => {g
+export const getAudiobookByName = async (accessToken, audiobookName) => {
     try {
         const searchURL = 'https://api.spotify.com/v1/search';
 
