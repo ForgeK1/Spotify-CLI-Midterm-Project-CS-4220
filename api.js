@@ -68,75 +68,58 @@ export const getToken = async () => {
     
 };
 
-/*Methods to search the API by keyword*/
+/* 2 methods to search the API either by the name or ID*/
 
-//A method to get an Album as a JSON object by their name
-export const getAlbumByName = async (accessToken, albumName) => {
-    try{
-        /*Since the program is searching an album by name, it uses the Spotify's search endpoint
-          instead of the album endpoint*/
+/*
+    The searchByName function takes in two parameters: the accessToken and the name to search for.
+    It uses Spotify's default search endpoint: https://api.spotify.com/v1/search. This function
+    builds on that base URL by appending the search term (name) and specifying the types to search
+    for, such as albums, artists, audiobooks, and tracks. The final URL is structured in a way that
+    Spotify's API can recognize and respond to. Since this method performs a broad search across
+    multiple content types, it returns more general data, rather than a single, specific object. 
+*/
+export const searchByName = async (accessToken, name) => {
+    try {
         const searchURL = 'https://api.spotify.com/v1/search';
-
-        /*Offers a new concatonation of the search endpoint and access token to obtain a 
-          successful Promise through a GET request*/
-        const response = await axios.get
-            (searchURL + '?q=' + albumName + '&type=album', {
-                    headers: {
-                        'Authorization': 'Bearer ' + accessToken,
-                    }
+        const response = await axios.get(
+            `${searchURL}?q=${encodeURIComponent(name)}&type=album,artist,audiobook,track`, {
+                headers: {
+                    'Authorization': 'Bearer ' + accessToken,
                 }
-            );
-        
-        //Utilizes the Promise variable to return a specified set of album(s) by name as a JSON object
+            }
+        );
         return response.data;
+    } catch (error) {
+        console.error(`Error in searchByName: ${error.message}`);
     }
-    catch(error){
-        console.error(`Error: ${error.message}`);
-    }
-}
+};
 
-//A method to get an artist as a JSON object by their name
-export const getArtistByName = async (accessToken, artistName) => {
-    
-}
+/*
 
-//A method to get an audiobook as a JSON object by their name
-export const getAudiobookByName = async (accessToken, audiobookName) => {
-    
-}
+    The getByID function takes three parameters: accessToken, type, and the item's id.
+    Unlike the searchByName function, which uses Spotify's general search endpoint,
+    this function relies on a type-specific endpoint. That’s why the URL structure
+    is a bit different — it's built to retrieve a single, specific object.
+    The function constructs the final URL by appending the content type
+    (such as artist, album, or audiobook) and the item's ID to the base URL.
+    This allows the API to return the exact object associated with that ID. 
 
-/*Methods to search the API by ID*/
-
-//A method to get an album as a JSON object by their ID
-export const getAlbumByID = async (accessToken, albumID) => {
-    try{
-        //This is the Spotify's URL for the albums endpoint
-        const albumURL = 'https://api.spotify.com/v1/albums/';
-
-        /*Offers the albums endpoint and access token to obtain a successful Promise 
-          through a GET request*/
-        const response = await axios.get
-            (albumURL + albumID, {
-                    headers: {
-                        'Authorization': 'Bearer ' + accessToken,
-                    }
-                }
-            );
-
-        //Utilizes the Promise variable to return the specified album by ID as a JSON object
+*/
+export const getByID = async (accessToken, type, id) => {
+    try {
+        const url = `https://api.spotify.com/v1/${type}s/${id}`;
+        const response = await axios.get(url, {
+            headers: {
+                'Authorization': 'Bearer ' + accessToken,
+            }
+        });
         return response.data;
+    } catch (error) {
+        console.error(`Error in getByID: ${error.message}`);
     }
-    catch(error){
-        console.error(`Error: ${error.message}`);
-    }
-}
+};
 
-//A method to get an artist as a JSON object by their ID
-export const getArtistByID = async (accessToken, artistID) => {
-    
-}
 
-//A method to get an artist as a JSON object by their ID
-export const getAudiobookByID = async (accessToken, audiobookID) => {
-    
-}
+
+  
+
