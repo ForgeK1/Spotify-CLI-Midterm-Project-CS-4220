@@ -35,11 +35,11 @@ const displayItemDetails = async (item, type) => {
     console.log(`\n---Top Tracks---`);
     //iterate thru the track array to grab the top 5 tracks shown on spotify
     topTracks.tracks.slice(0, 5).forEach((track, i) => {
-        //showcase the tracks like:
-        //1. track #1
-        //2. track #2
-        //3. track #3
-        console.log(`${i+1}. ${track.name}`);
+      //showcase the tracks like:
+      //1. track #1
+      //2. track #2
+      //3. track #3
+      console.log(`${i + 1}. ${track.name}`);
     });
   } else if (type === "album") {
     console.log(`Album: ${item.name}`);
@@ -174,15 +174,12 @@ export const getSelectionHistory = async () => {
 
     //if choose the exit option then end process
     if (selectedItem === "exit") {
-      console.log(chalk.blue("Exiting history."));
+      console.log("Exiting history.");
       return;
     }
 
     //get all relevent information from the api
-    const itemDetails = await api.getByID(
-      selectedItem.type,
-      selectedItem.id
-    );
+    const itemDetails = await api.getByID(selectedItem.type, selectedItem.id);
 
     //display the detailed information, please make the const name displayItemDetails, i beg of you
     displayItemDetails(itemDetails, selectedItem.type);
