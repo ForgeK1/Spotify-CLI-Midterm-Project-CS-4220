@@ -17,7 +17,6 @@ import * as api from "./api.js"; //custom module for interacting with Spotify AP
 import * as db from "./db.js"; //custom module for database operations
 import path from "path"; //path module for handling file paths
 import url from "url"; //url module for handling file URLs
-import { asapScheduler } from "rxjs";
 
 //get current directory in ESM (ECMAScript Modules) - lowkey ass pull, idk
 const __filename = url.fileURLToPath(import.meta.url);
