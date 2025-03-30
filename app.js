@@ -25,12 +25,22 @@ const __dirname = path.dirname(__filename);
 //define the path to the mock database directory
 const dbDirectory = path.resolve(__dirname, "mock_database");
 
-const displayItemDetails = (item, type) => {
+const displayItemDetails = async (item, type) => {
   if (type === "artist") {
     console.log(`Artist ${item.name}`);
     console.log(`Followers: ${item.followers.total.toLocaleString()}`);
     console.log(`Popularity: ${item.popularity}/100`);
     console.log(`Genres: ${item.genres.join(",") || "N/A"}`);
+    const topTracks = await api.getTopTracks(item.id);
+    console.log(`\n---Top Tracks---`);
+    //iterate thru the track array to grab the top 5 tracks shown on spotify
+    topTracks.tracks.slice(0, 5).forEach((track, i) => {
+        //showcase the tracks like:
+        //1. track #1
+        //2. track #2
+        //3. track #3
+        console.log(`${i+1}. ${track.name}`);
+    });
   } else if (type === "album") {
     console.log(`Album: ${item.name}`);
     console.log(`Artist: ${item.artists.map((a) => a.name).join(",")}`);
@@ -168,12 +178,8 @@ export const getSelectionHistory = async () => {
       return;
     }
 
-    //get access token
-    const accessToken = await api.getToken();
-
     //get all relevent information from the api
     const itemDetails = await api.getByID(
-      accessToken,
       selectedItem.type,
       selectedItem.id
     );
@@ -187,11 +193,8 @@ export const getSelectionHistory = async () => {
 
 // search function to search for: artists, albums, tracks, and audiobooks.
 // additionally saves the search query into the local database if it's a unique insertion in the database.
-export const search = async (keyword, type = null) => {
+export const search = async (keyword, type) => {
   try {
-    // get spotify access token for authentication.
-    const accessToken = await api.getToken();
-
     // if type is not provided, prompt user to choose one of: artists, albums, tracks, or audiobooks.
     if (!type) {
       const { selectedType } = await inquirer.prompt([
@@ -211,7 +214,7 @@ export const search = async (keyword, type = null) => {
     }
 
     // perform search using the keyword with spotify api.
-    const searchResults = await api.searchByName(accessToken, keyword);
+    const searchResults = await api.searchByName(keyword);
 
     // save search keyword to local database if the keyword+type combination is unique.
     // verify whether this keyword and type combination already exists in the search history.
@@ -299,7 +302,7 @@ export const search = async (keyword, type = null) => {
     }
 
     // retrieve detailed information for the chosen item using its id.
-    const itemDetails = await api.getByID(accessToken, type, selectedItem.id);
+    const itemDetails = await api.getByID(type, selectedItem.id);
 
     // save the chosen item to local history if it hasn't been saved already.
     const existingSelections = await db.find("search_history_selection", {
@@ -323,9 +326,3 @@ export const search = async (keyword, type = null) => {
     console.error(`Error during search: ${error.message}`);
   }
 };
-
-const run = async () => {
-  await getHistory("selections");
-};
-
-run();

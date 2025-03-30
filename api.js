@@ -78,11 +78,13 @@ export const getToken = async () => {
     Spotify's API can recognize and respond to. Since this method performs a broad search across
     multiple content types, it returns more general data, rather than a single, specific object. 
 */
-export const searchByName = async (accessToken, name) => {
+export const searchByName = async (name) => {
     try {
+        const accessToken = await getToken();
         const searchURL = 'https://api.spotify.com/v1/search';
         const response = await axios.get(
             `${searchURL}?q=${encodeURIComponent(name)}&type=album,artist,audiobook,track`, {
+                params: { limit: 10 ,market: 'US' },
                 headers: {
                     'Authorization': 'Bearer ' + accessToken,
                 }
@@ -105,8 +107,9 @@ export const searchByName = async (accessToken, name) => {
     This allows the API to return the exact object associated with that ID. 
 
 */
-export const getByID = async (accessToken, type, id) => {
+export const getByID = async (type, id) => {
     try {
+        const accessToken = await getToken();
         const url = `https://api.spotify.com/v1/${type}s/${id}`;
         const response = await axios.get(url, {
             headers: {
@@ -118,8 +121,21 @@ export const getByID = async (accessToken, type, id) => {
         console.error(`Error in getByID: ${error.message}`);
     }
 };
-
-
+export const getTopTracks = async (artistId) => {
+    try {
+        const accessToken = await getToken();
+        const url = `https://api.spotify.com/v1/artists/${artistId}/top-tracks`;
+        const response = await axios.get(url, {
+            params: { market: 'US' },
+            headers: {
+                'Authorization': 'Bearer ' + accessToken,
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error(`Error in getTopTracks: ${error.message}`);
+    }
+};
 
   
 
