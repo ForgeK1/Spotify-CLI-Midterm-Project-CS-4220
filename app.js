@@ -185,6 +185,145 @@ export const getSelectionHistory = async () => {
   }
 };
 
+// search function to search for: artists, albums, tracks, and audiobooks.
+// additionally saves the search query into the local database if it's a unique insertion in the database.
+export const search = async (keyword, type = null) => {
+  try {
+    // get spotify access token for authentication.
+    const accessToken = await api.getToken();
+
+    // if type is not provided, prompt user to choose one of: artists, albums, tracks, or audiobooks.
+    if (!type) {
+      const { selectedType } = await inquirer.prompt([
+        {
+          type: "list",
+          name: "selectedType",
+          message: "What do you want to search for?",
+          choices: [
+            { name: "Artists", value: "artist" },
+            { name: "Albums", value: "album" },
+            { name: "Tracks", value: "track" },
+            { name: "Audiobooks", value: "audiobook" },
+          ],
+        },
+      ]);
+      type = selectedType;
+    }
+
+    // perform search using the keyword with spotify api.
+    const searchResults = await api.searchByName(accessToken, keyword);
+
+    // save search keyword to local database if the keyword+type combination is unique.
+    // verify whether this keyword and type combination already exists in the search history.
+    const existingKeywords = await db.find("search_history_keyword", {
+      keyword: keyword,
+      type: type,
+    });
+
+    // if the combination is new, insert the keyword and type into the search history database.
+    if (existingKeywords.length === 0) {
+      await db.insert("search_history_keyword", {
+        keyword: keyword,
+        type: type,
+        timestamp: new Date().toISOString(),
+      });
+    }
+
+    // extract search results corresponding to the selected type (artist, album, track, or audiobook).
+    let items = [];
+    if (type === "artist") {
+      items = searchResults.artists.items;
+    } else if (type === "album") {
+      items = searchResults.albums.items;
+    } else if (type === "track") {
+      items = searchResults.tracks.items;
+    } else if (type === "audiobook") {
+      items = searchResults.audiobooks.items;
+    }
+
+    // if no results are found, inform user and terminate search.
+    if (items.length === 0) {
+      console.log(`No ${type}s found for "${keyword}"`);
+      return;
+    }
+
+    // format search results for display as a selectable list.
+    const choices = items.map((item) => {
+      let displayText = "";
+
+      if (type === "artist") {
+        displayText = `${
+          item.name
+        } - ${item.followers.total.toLocaleString()} followers`;
+      } else if (type === "album") {
+        displayText = `${item.name} by ${item.artists
+          .map((a) => a.name)
+          .join(", ")}`;
+      } else if (type === "track") {
+        displayText = `${item.name} by ${item.artists
+          .map((a) => a.name)
+          .join(", ")} on ${item.album.name}`;
+      } else if (type === "audiobook") {
+        displayText = `${item.name} by ${item.authors
+          .map((a) => a.name)
+          .join(", ")}`;
+      }
+
+      return {
+        name: displayText,
+        value: item,
+      };
+    });
+
+    // insert an "exit" option at the beginning of the choices list.
+    choices.unshift({
+      name: "Exit",
+      value: "exit",
+    });
+
+    // prompt user to select an item from the formatted search results.
+    const { selectedItem } = await inquirer.prompt([
+      {
+        type: "list",
+        name: "selectedItem",
+        message: `Select a ${type} from the search results:`,
+        choices: choices,
+        pageSize: 10,
+      },
+    ]);
+
+    // if user selects "exit", terminate the search operation.
+    if (selectedItem === "exit") {
+      console.log("Exiting search.");
+      return;
+    }
+
+    // retrieve detailed information for the chosen item using its id.
+    const itemDetails = await api.getByID(accessToken, type, selectedItem.id);
+
+    // save the chosen item to local history if it hasn't been saved already.
+    const existingSelections = await db.find("search_history_selection", {
+      id: selectedItem.id,
+    });
+
+    // if the selection is unique, insert it into the search history for selections.
+    if (existingSelections.length === 0) {
+      await db.insert("search_history_selection", {
+        id: selectedItem.id,
+        name: selectedItem.name,
+        type: type,
+        timestamp: new Date().toISOString(),
+      });
+    }
+
+    // display the retrieved detailed information for the selected item.
+    displayItemDetails(itemDetails, type);
+  } catch (error) {
+    // handle errors by logging the error message to the console.
+    console.error(`Error during search: ${error.message}`);
+  }
+};
+
 const run = async () => {
   await getHistory("selections");
 };
