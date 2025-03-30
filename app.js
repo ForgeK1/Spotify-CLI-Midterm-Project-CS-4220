@@ -73,7 +73,7 @@ export const getHistory = async (type) => {
       );
     }
   } catch (error) {
-    console.error("Error getting history: ${error.message}");
+    console.error(`Error getting history: ${error.message}`);
   }
 };
 
@@ -127,7 +127,7 @@ export const getSearchHistory = async () => {
     //search again using the selected keyword, make sure the name of the const is search
     await search(selectedKeyword.keyword, selectedKeyword.type);
   } catch (error) {
-    console.error("Error getting search history: ${error.message}");
+    console.error(`Error getting search history: ${error.message}`);
   }
 };
 
@@ -187,7 +187,7 @@ export const getSelectionHistory = async () => {
     //display the detailed information, please make the const name displayItemDetails, i beg of you
     displayItemDetails(itemDetails, selectedItem.type);
   } catch (error) {
-    console.error("Error getting selection history: ${error.message}");
+    console.error(`Error getting selection history: ${error.message}`);
   }
 };
 
