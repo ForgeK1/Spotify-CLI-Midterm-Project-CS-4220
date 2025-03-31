@@ -1,6 +1,8 @@
 /*
 Class Description: 
-    - 
+    - A command-line interface (CLI) router that defines and handles user commands using Yargs to 
+      interact with Spotify’s Web API for searching and retrieving tracks, artists, albums, and 
+      audiobooks, as well as viewing search history.
 
 Contributors: 
     - Jorge Arias
