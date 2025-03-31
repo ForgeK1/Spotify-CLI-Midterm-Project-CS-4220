@@ -77,7 +77,7 @@ yargs(hideBin(process.argv))
       }
     }
   )
-  //trach cmd
+  //track cmd
   //want to create a cmd that shows all the data of the track that is searched)this is NOT using the search cmd
   //It would be like: node cli.js track "luther" -> specifies what to search for
   .command(
