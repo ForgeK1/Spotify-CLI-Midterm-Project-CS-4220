@@ -121,6 +121,7 @@ export const getByID = async (type, id) => {
         console.error(`Error in getByID: ${error.message}`);
     }
 };
+
 export const getTopTracks = async (artistId) => {
     try {
         const accessToken = await getToken();
@@ -136,6 +137,3 @@ export const getTopTracks = async (artistId) => {
         console.error(`Error in getTopTracks: ${error.message}`);
     }
 };
-
-  
-
