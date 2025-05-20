@@ -7,9 +7,9 @@ Spotify CLI is a Node.js-based command-line application that interacts with Spot
 node cli.js --help
 
 # Example commands
-node cli.js search "Eminem" artist 
-node cli.js artist "Kendrick Lamar" 
-node cli.js track "Reborn"
-node cli.js album "Graduation"
-node cli.js audiobook "The Alchemist"
-node cli.js history keywords
+- node cli.js search "Eminem" artist 
+- node cli.js artist "Kendrick Lamar" 
+- node cli.js track "Reborn"
+- node cli.js album "Graduation"
+- node cli.js audiobook "The Alchemist"
+- node cli.js history keywords
